@@ -4,10 +4,8 @@ using System.CommandLine.Invocation;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using PixelMatch.GDI;
-using PixelMatch.net;
 
-namespace PixelMatch.cli
+namespace StronglyTyped.PixelMatch
 {
 	class Program
 	{

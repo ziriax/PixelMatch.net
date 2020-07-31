@@ -1,4 +1,4 @@
-﻿namespace PixelMatch.net
+﻿namespace StronglyTyped.PixelMatch
 {
 	/// <summary>
 	/// Pixel matcher for 32-bit colors.

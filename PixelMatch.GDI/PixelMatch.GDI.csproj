@@ -1,12 +1,36 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>StronglyTyped.PixelMatch.GDI</AssemblyName>
+    <RootNamespace>StronglyTyped.PixelMatch</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>Peter Verswyvelen</Authors>
+    <Company>Strongly Typed Solutions</Company>
+    <Product>PixelMatch.GDI</Product>
+    <Description>C# port of the MapBox pixelmatch image comparison library.
+
+This helper library allows comparing two System.Drawing images using StronglyTyped.PixelMatch.net
+</Description>
+    <Copyright>(C)2020 Peter Verswyvelen</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/Ziriax/PixelMatch.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ziriax/PixelMatch.net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>image bitmap graphics compare similar</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PixelMatch.net\PixelMatch.net.csproj" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

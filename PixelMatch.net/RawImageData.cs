@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace PixelMatch.net
+namespace StronglyTyped.PixelMatch
 {
 	/// <summary>
 	/// Wraps a memory region of pixels

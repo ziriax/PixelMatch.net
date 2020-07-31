@@ -1,7 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>Peter Verswyvelen</Authors>
+    <Company>Strongly Typed Solutions</Company>
+    <AssemblyName>StronglyTyped.PixelMatch.net</AssemblyName>
+    <RootNamespace>StronglyTyped.PixelMatch</RootNamespace>
+    <Product>PixelMatch.net</Product>
+    <Description>C# port of the MapBox pixelmatch image comparison library.
+
+Features accurate anti-aliased pixels detection and perceptual color difference metrics.
+
+Implements ideas from the following papers:
+
+Measuring perceived color difference using YIQ NTSC transmission color space in mobile applications (2010, Yuriy Kotsarenko, Fernando Ramos)
+
+Anti-aliased pixel and intensity slope detector (2009, Vytautas Vyšniauskas)</Description>
+    <Copyright>(C)2019 mapbox, (C)2020 Peter Verswyvelen</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/Ziriax/PixelMatch.net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ziriax/PixelMatch.net</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>image bitmap graphics compare similar</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -11,5 +33,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

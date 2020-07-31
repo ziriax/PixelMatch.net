@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace PixelMatch.net
+namespace StronglyTyped.PixelMatch
 {
 	public interface IAbstractImage<TRawColor> : IDisposable
 		where TRawColor : unmanaged

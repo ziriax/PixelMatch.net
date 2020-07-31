@@ -1,8 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using PixelMatch.net;
 
-namespace PixelMatch.GDI
+namespace StronglyTyped.PixelMatch
 {
 	public sealed class BitmapImagePBgra32 : InterleavedImagePBgra32
 	{

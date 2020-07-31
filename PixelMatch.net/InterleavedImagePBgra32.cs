@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace PixelMatch.net
+namespace StronglyTyped.PixelMatch
 {
 	public class InterleavedImagePBgra32 : IAbstractImage<uint>
 	{

@@ -1,12 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PixelMatch.GDI;
-using PixelMatch.net;
 
-namespace PixelMatch.test
+namespace StronglyTyped.PixelMatch
 {
 	[TestClass]
 	public class DiffTests

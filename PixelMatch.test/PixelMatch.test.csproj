@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
+    <AssemblyName>StronglyTyped.PixelMatch.test</AssemblyName>
+    <RootNamespace>StronglyTyped.PixelMatch</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

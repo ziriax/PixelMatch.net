@@ -1,9 +1,10 @@
 ﻿// ReSharper disable CompareOfFloatsByEqualityOperator
+
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace PixelMatch.net
+namespace StronglyTyped.PixelMatch
 {
 	public class AbstractPixelMatcher<TRawColor>
 		where TRawColor : unmanaged

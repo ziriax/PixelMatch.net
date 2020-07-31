@@ -15,34 +15,28 @@ namespace StronglyTyped.PixelMatch
 
 		public readonly T* Pixels;
 		public readonly int Stride;
-		public readonly (int, int) Size;
+		public readonly int Width;
+		public readonly int Height;
 
-		public RawImageData((int width, int height) size, T* pixels, int pixelStride)
+		internal RawImageData(int width, int height, T* pixels, int pixelStride)
 		{
 			_handle = default;
 
 			Pixels = pixels;
 			Stride = pixelStride;
-			Size = size;
+
+			Width = width;
+			Height = height;
 		}
 
-		public RawImageData((int width, int height) size, byte* pixels, int byteStride) : this(size, (T*)pixels, byteStride >> 2)
-		{
-			if (byteStride % 4 != 0)
-				throw new ArgumentException($"{nameof(byteStride)} must be a multiple of 4");
-		}
-
-		public RawImageData((int width, int height) size, IntPtr pixels, int byteStride) : this(size, (byte*)pixels.ToPointer(), byteStride)
-		{
-		}
-
-		public RawImageData((int width, int height) size, GCHandle handle, int pixelStride)
+		internal RawImageData(int width, int height, GCHandle handle, int pixelStride)
 		{
 			_handle = handle;
 
 			Pixels = (T*)handle.AddrOfPinnedObject();
 			Stride = pixelStride;
-			Size = size;
+			Width = width;
+			Height = height;
 		}
 
 		~RawImageData()
@@ -52,7 +46,7 @@ namespace StronglyTyped.PixelMatch
 		}
 
 		public RawImageData(T[,] pixels) : this(
-			(pixels.GetLength(0), pixels.GetLength(1)),
+			pixels.GetLength(0), pixels.GetLength(1),
 			GCHandle.Alloc(pixels, GCHandleType.Pinned),
 			pixels.GetLength(0))
 		{
@@ -69,6 +63,35 @@ namespace StronglyTyped.PixelMatch
 				_handle.Free();
 				_handle = default;
 			}
+		}
+	}
+
+	public static unsafe class RawImageData
+	{
+		public static RawImageData<T> Create<T>(int width, int height, T* pixels, int pixelStride) where T : unmanaged
+		{
+			return new RawImageData<T>(width, height, pixels, pixelStride);
+		}
+
+		public static RawImageData<T> Create<T>(int width, int height, GCHandle handle, int pixelStride)
+			where T : unmanaged
+		{
+			return new RawImageData<T>(width, height, handle, pixelStride);
+		}
+
+		public static RawImageData<T> Create<T>(int width, int height, byte* pixels, int byteStride)
+			where T : unmanaged
+		{
+			if (byteStride % sizeof(T) != 0)
+				throw new ArgumentException($"{nameof(byteStride)} must be a multiple of {sizeof(T)}");
+
+			return Create(width, height, (T*)pixels, byteStride / sizeof(T));
+		}
+
+		public static RawImageData<T> Create<T>(int width, int height, IntPtr pixels, int byteStride)
+			where T : unmanaged
+		{
+			return Create<T>(width, height, (byte*)pixels.ToPointer(), byteStride);
 		}
 	}
 }

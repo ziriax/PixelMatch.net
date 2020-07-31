@@ -6,7 +6,8 @@ namespace StronglyTyped.PixelMatch
 	public interface IAbstractImage<TRawColor> : IDisposable
 		where TRawColor : unmanaged
 	{
-		(int width, int height) Size { get; }
+		int Width { get; }
+		int Height { get; }
 
 		/// <summary>
 		/// Returns a raw color value

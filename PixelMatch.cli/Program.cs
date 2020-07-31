@@ -46,31 +46,39 @@ namespace StronglyTyped.PixelMatch
 
 			rootCommand.Handler = CommandHandler.Create((float threshold, bool skipColorCorrection, bool includeAntiAliasedPixels, FileInfo imagePath1, FileInfo imagePath2) =>
 			{
-				using var stream1 = imagePath1.OpenRead();
-				using var stream2 = imagePath2.OpenRead();
-				using var bitmap1 = new Bitmap(stream1, !skipColorCorrection);
-				using var bitmap2 = new Bitmap(stream2, !skipColorCorrection);
-				using var image1 = new BitmapImagePBgra32(bitmap1);
-				using var image2 = new BitmapImagePBgra32(bitmap2);
-				var matcher = new PixelMatcher32
+				try
 				{
-					Threshold = threshold,
-					IgnoreAntiAliasedPixels = !includeAntiAliasedPixels
-				};
+					using var stream1 = imagePath1.OpenRead();
+					using var stream2 = imagePath2.OpenRead();
+					using var bitmap1 = new Bitmap(stream1, !skipColorCorrection);
+					using var bitmap2 = new Bitmap(stream2, !skipColorCorrection);
+					using var image1 = new BitmapImagePBgra32(bitmap1);
+					using var image2 = new BitmapImagePBgra32(bitmap2);
+					var matcher = new PixelMatcher32
+					{
+						Threshold = threshold,
+						IgnoreAntiAliasedPixels = !includeAntiAliasedPixels
+					};
 
-				var area = bitmap1.Width * bitmap1.Height;
-				var sw = new Stopwatch();
-				sw.Start();
-				var count = matcher.Compare(image1, image2);
-				var percentage = count * 100D / area;
-				var ms = sw.ElapsedMilliseconds;
-				Console.WriteLine($"matched in: {ms}ms");
-				Console.WriteLine($"different pixels: {count}");
-				Console.WriteLine($"error: {percentage:0.00}%");
-				return (int)Math.Ceiling(percentage);
+					var area = bitmap1.Width * bitmap1.Height;
+					var sw = new Stopwatch();
+					sw.Start();
+					var count = matcher.Compare(image1, image2);
+					var percentage = count * 100D / area;
+					var ms = sw.ElapsedMilliseconds;
+					Console.WriteLine($"matched in: {ms}ms");
+					Console.WriteLine($"different pixels: {count}");
+					Console.WriteLine($"error: {percentage:0.00}%");
+					return (int)Math.Ceiling(percentage);
+				}
+				catch (Exception ex)
+				{
+					Console.Error.WriteLine($"Error: {ex.Message}");
+					return 100;
+				}
 			});
 
-			return rootCommand.InvokeAsync(args).Result;
+			return rootCommand.Invoke(args);
 		}
 	}
 }

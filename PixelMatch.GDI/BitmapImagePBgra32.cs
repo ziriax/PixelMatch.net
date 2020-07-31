@@ -15,7 +15,7 @@ namespace StronglyTyped.PixelMatch
 		}
 
 		public BitmapImagePBgra32(BitmapData bitmapData, Bitmap unlockingImage = null)
-			: base(new RawImageData<uint>((bitmapData.Width, bitmapData.Height), bitmapData.Scan0, bitmapData.Stride))
+			: base(RawImageData.Create<uint>(bitmapData.Width, bitmapData.Height, bitmapData.Scan0, bitmapData.Stride))
 		{
 			_bitmapData = bitmapData;
 			_unlockingImage = unlockingImage;

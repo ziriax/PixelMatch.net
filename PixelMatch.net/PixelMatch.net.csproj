@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Peter Verswyvelen</Authors>
     <Company>Strongly Typed Solutions</Company>
     <AssemblyName>StronglyTyped.PixelMatch.net</AssemblyName>
@@ -17,22 +17,22 @@ Implements ideas from the following papers:
 
 Measuring perceived color difference using YIQ NTSC transmission color space in mobile applications (2010, Yuriy Kotsarenko, Fernando Ramos)
 
-Anti-aliased pixel and intensity slope detector (2009, Vytautas Vyšniauskas)</Description>
+Anti-aliased pixel and intensity slope detector (2009, Vytautas Vyšniauskas)
+</Description>
     <Copyright>(C)2019 mapbox, (C)2020 Peter Verswyvelen</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Ziriax/PixelMatch.net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ziriax/PixelMatch.net</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>image bitmap graphics compare similar</PackageTags>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\LICENSE">

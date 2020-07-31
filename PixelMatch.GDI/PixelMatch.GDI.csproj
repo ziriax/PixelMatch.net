@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <AssemblyName>StronglyTyped.PixelMatch.GDI</AssemblyName>
     <RootNamespace>StronglyTyped.PixelMatch</RootNamespace>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Peter Verswyvelen</Authors>
     <Company>Strongly Typed Solutions</Company>
     <Product>PixelMatch.GDI</Product>
@@ -19,6 +19,7 @@ This helper library allows comparing two System.Drawing images using StronglyTyp
     <RepositoryUrl>https://github.com/Ziriax/PixelMatch.net</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>image bitmap graphics compare similar</PackageTags>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

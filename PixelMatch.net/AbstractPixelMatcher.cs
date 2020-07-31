@@ -180,14 +180,19 @@ namespace StronglyTyped.PixelMatch
 		/// </returns>
 		public int Compare(IAbstractImage<TRawColor> img1, IAbstractImage<TRawColor> img2, Action<int, int, float> onDifference = null)
 		{
-			if (img1.Size != img2.Size)
-				throw new ArgumentOutOfRangeException($"Can't compare images with different sizes ({img1.Size} vs {img2.Size}");
+			if (img1.Width != img2.Width)
+				throw new ArgumentOutOfRangeException($"Can't compare images with different widths ({img1.Width} vs {img2.Width}");
+
+			if (img1.Height != img2.Height)
+				throw new ArgumentOutOfRangeException($"Can't compare images with different heights ({img1.Height} vs {img2.Height}");
 
 			// maximum acceptable square distance between two colors;
 			// 35215 is the maximum possible value for the YIQ difference metric using 8-bit colors
 			var maxDelta = (35215f / 255f / 255f) * (Threshold * Threshold);
 			var aa = !IgnoreAntiAliasedPixels;
-			var (width, height) = img1.Size;
+
+			var width = img1.Width;
+			var height = img1.Height;
 
 			var query = Enumerable.Range(0, height).AsParallel();
 

@@ -1,13 +1,14 @@
 ﻿// ReSharper disable CompareOfFloatsByEqualityOperator
 
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace StronglyTyped.PixelMatch
 {
-	public class AbstractPixelMatcher<TRawColor>
-		where TRawColor : unmanaged
+	public abstract class AbstractPixelMatcher
 	{
 		/// <summary>
 		/// Matching threshold (0 to 1); smaller is more sensitive (default=0.1)
@@ -19,17 +20,22 @@ namespace StronglyTyped.PixelMatch
 		/// </summary>
 		public bool IgnoreAntiAliasedPixels = true;
 
-		private static readonly Vector4 Rgb2Y = new Vector4(0.29889531f, 0.58662247f, 0.11448223f, 0);
-		private static readonly Vector4 Rgb2I = new Vector4(0.59597799f, -0.27417610f, -0.32180189f, 0);
-		private static readonly Vector4 Rgb2Q = new Vector4(0.21147017f, -0.52261711f, 0.31114694f, 0);
-		private static readonly Vector4 Yid2D = new Vector4(0.5053f, 0.299f, 0.1957f, 0);
+		/// <summary>
+		/// <see cref="ParallelOptions.MaxDegreeOfParallelism"/>
+		/// </summary>
+		public int? MaxDegreeOfParallelism;
+
+		protected static readonly Vector4 Rgb2Y = new Vector4(0.29889531f, 0.58662247f, 0.11448223f, 0);
+		protected static readonly Vector4 Rgb2I = new Vector4(0.59597799f, -0.27417610f, -0.32180189f, 0);
+		protected static readonly Vector4 Rgb2Q = new Vector4(0.21147017f, -0.52261711f, 0.31114694f, 0);
+		protected static readonly Vector4 Yid2D = new Vector4(0.5053f, 0.299f, 0.1957f, 0);
 
 		/// <summary>
 		/// calculate color luminance difference according to the paper "Measuring perceived color difference
 		/// using YIQ NTSC transmission color space in mobile applications" by Y. Kotsarenko and F. Ramos
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private float ColorDeltaY(Vector4 color1, Vector4 color2)
+		protected float ColorDeltaY(Vector4 color1, Vector4 color2)
 		{
 			var y1 = Vector4.Dot(color1, Rgb2Y);
 			var y2 = Vector4.Dot(color2, Rgb2Y);
@@ -42,7 +48,7 @@ namespace StronglyTyped.PixelMatch
 		/// using YIQ NTSC transmission color space in mobile applications" by Y. Kotsarenko and F. Ramos
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private float ColorDelta(Vector4 color1, Vector4 color2)
+		protected float ColorDelta(Vector4 color1, Vector4 color2)
 		{
 			var y1 = Vector4.Dot(color1, Rgb2Y);
 			var y2 = Vector4.Dot(color2, Rgb2Y);
@@ -58,6 +64,11 @@ namespace StronglyTyped.PixelMatch
 			return y1 > y2 ? -delta : delta;
 		}
 
+	}
+
+	public class AbstractPixelMatcher<TRawColor> : AbstractPixelMatcher
+		where TRawColor : unmanaged
+	{
 		/// <summary>
 		/// check if a pixel has 3+ adjacent pixels of the same color. 
 		/// </summary>
@@ -175,49 +186,66 @@ namespace StronglyTyped.PixelMatch
 			// maximum acceptable square distance between two colors;
 			// 35215 is the maximum possible value for the YIQ difference metric using 8-bit colors
 			var maxDelta = (35215f / 255f / 255f) * (Threshold * Threshold);
-			var diff = 0;
 			var aa = !IgnoreAntiAliasedPixels;
 			var (width, height) = img1.Size;
 
-			// compare each pixel of one image against the other one
-			for (var y = 0; y < height; y++)
+			var query = Enumerable.Range(0, height).AsParallel();
+
+			if (MaxDegreeOfParallelism.HasValue)
 			{
-				for (var x = 0; x < width; x++)
-				{
-					// Fast path if pixels are binary equal
-					var raw1 = img1[x, y];
-					var raw2 = img2[x, y];
-					if (AreEqual(raw1, raw2))
-						continue;
+				var maxDegreeOfParallelism = MaxDegreeOfParallelism.Value;
+				if (maxDegreeOfParallelism <= 0)
+					maxDegreeOfParallelism = Environment.ProcessorCount;
 
-					var norm1 = img1.Normalized(raw1);
-					var norm2 = img2.Normalized(raw2);
-
-					// squared YUV distance between colors at this pixel position, negative if the img2 pixel is darker
-					var delta = ColorDelta(norm1, norm2);
-
-					if (Math.Abs(delta) > maxDelta)
-					{
-						// the color difference is above the threshold
-						// check it's a real rendering difference or just anti-aliasing
-						if (aa || (!IsAntiAliased(img1, norm1, x, y, width, height, img2) && !IsAntiAliased(img2, norm2, x, y, width, height, img1)))
-						{
-							// found substantial difference not caused by anti-aliasing
-							diff++;
-						}
-						else
-						{
-							// we ignore anti-aliased differences
-							delta = 0;
-						}
-
-						onDifference?.Invoke(x, y, delta);
-					}
-				}
+				query = query.WithDegreeOfParallelism(maxDegreeOfParallelism);
 			}
 
+			// compare each pixel of one image against the other one, in parallel
+			var result = query.Aggregate(
+				0,
+				delegate (int diff, int y)
+				{
+					for (var x = 0; x < width; x++)
+					{
+						// Fast path if pixels are binary equal
+						var raw1 = img1[x, y];
+						var raw2 = img2[x, y];
+						if (AreEqual(raw1, raw2))
+							continue;
+
+						var norm1 = img1.Normalized(raw1);
+						var norm2 = img2.Normalized(raw2);
+
+						// squared YUV distance between colors at this pixel position, negative if the img2 pixel is darker
+						var delta = ColorDelta(norm1, norm2);
+
+						if (Math.Abs(delta) > maxDelta)
+						{
+							// the color difference is above the threshold
+							// check it's a real rendering difference or just anti-aliasing
+							if (aa || (!IsAntiAliased(img1, norm1, x, y, width, height, img2) && !IsAntiAliased(img2, norm2, x, y, width, height, img1)))
+							{
+								// found substantial difference not caused by anti-aliasing
+								diff++;
+							}
+							else
+							{
+								// we ignore anti-aliased differences
+								delta = 0;
+							}
+
+							onDifference?.Invoke(x, y, delta);
+						}
+					}
+
+					return diff;
+				},
+				(diff1, diff2) => diff1 + diff2,
+				count => count
+			);
+
 			// return the number of different pixels
-			return diff;
+			return result;
 		}
 
 		protected virtual unsafe bool AreEqual(TRawColor color1, TRawColor color2)
